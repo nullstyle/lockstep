@@ -1,0 +1,4 @@
+projectDirectory = $CWD
+
+[ attr.untitled ]
+fileType = "source.ruby"
