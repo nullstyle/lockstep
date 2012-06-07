@@ -1,5 +1,7 @@
 # Lockstep - Coordinating value changes across computers cheaply and predicatbly
 
+_NOTE: this is still being developed.  it doesn't do shit right now.  but hey, the specs pass_
+
 Let's describe a situation.  You run a website that serves a crazy amount of traffic: Over a billion dynamic requests per day.  That's nearly 12,000 requests per second.  Let's now assume you have a piece of data that you want to access on _every_ request. You also want to be reasonably sure that every server you have sees the same value of that data at a given point in time.  Normally, you have a couple of options to how you can store this data:
 
 1.  In your source code:  define a constant value and simply access the in memory value.  The drawback here is that to change this value you need to deploy your application.  This is best used for values that change very infrequently.  This solution is infinitely scaleable, but inflexible.
