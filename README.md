@@ -26,7 +26,3 @@ In regards to your servers:
 
 In regards to your data:
 
-
-## Questions
-
-- How do we change tick size?  The main concern with a tick size that changes is that you each client uses the tick size to optimize how often it needs to check for new tuples.  So
