@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "rake"
   s.add_development_dependency "rspec", ">= 2.9.0"
+  s.add_development_dependency "rr"
   
   s.add_development_dependency "redis"
 
