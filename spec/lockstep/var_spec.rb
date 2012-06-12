@@ -26,14 +26,28 @@ module Lockstep
         subject.get 
       end
       
-      it "should return the oldest value (based upon active_at) that is active" do
-        @storage.write("foo", @time_base -10, 10, 10)
+      it "should return the newest value (based upon active_at) that is active" do
+        @storage.write("foo", @time_base - 10, 10, 10)
+        @storage.write("foo", @time_base - 5, 20, 10)
+        subject.get(@time_base).should eq(20)
+      end
+      
+      it "should return a value that is made active on the second it becomes available" do
+        @storage.write("foo", @time_base, 10, 10)
         subject.get(@time_base).should eq(10)
       end
       
+      
       it "should return the oldest active value, even if a future value is scheduled" do
-        
+        @storage.write("foo", @time_base, 10, 10)
+        @storage.write("foo", @time_base + 1, 20, 10)
+        subject.get(@time_base).should eq(10)
       end
+    end
+    
+    describe "#set" do
+      
+      
     end
   end  
 end

@@ -69,7 +69,7 @@ module Lockstep
     def active_tuple(current_time)
       @tuples.reverse.find do |tuple|
         active_at, value, check_time = *tuple
-        active_at < current_time
+        active_at <= current_time
       end
     end
 

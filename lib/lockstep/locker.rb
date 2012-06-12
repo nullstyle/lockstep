@@ -15,12 +15,16 @@ module Lockstep
     ##
     # Returns a reference to a lockstep variable
     #
-    def var(name, tick_size)
+    # @param [String,Symbol] name the name of this var.
+    # @param [Fixnum] tick_size The default tick_size of the returned var
+    def var(name, tick_size=20)
       @vars[name] ||= Var.new(self, name, tick_size)
     end
 
     ##
-    # Iterates through each registered var on this locker and reloads from the DB if needed
+    # Iterates through each registered var on this locker and reloads from the
+    # DB if needed.  In general, you would insert a call to this at every 
+    # request boundary within your server.
     #
     def refresh_if_needed
       @vars.values.each(&:refresh_if_needed)
