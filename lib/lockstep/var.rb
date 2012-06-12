@@ -3,7 +3,7 @@ module Lockstep
   # a Var is the main object within lockstep.  It implements the algorithm
   # described in the readme to provide a scaleable method of 
   # 
-  class Var
+  class Var    
     def initialize(storage, name, tick_size)
       @storage = storage
       @name = name
@@ -53,19 +53,36 @@ module Lockstep
     end
 
     def refresh
-      @tuples = storage.read(@name)
+      @tuples = @storage.read(@name)
       #TODO: @next_check_at = current_time + active_tuple.tick_size
+    end
+    
+    ##
+    # The time at which this var should be checked against the database for any 
+    # recorded changes.  The current value of the var is used to determine the 
+    # tick size, and the next_check_at will be at the next tick (using the 
+    # current values active_at to determine the starting point)
+    # 
+    # @param [Time] active_time The time to use for determining "now".
+    # @return [Time,nil] the next time that the storage system will be checked 
+    def next_check_at(active_time=Time.now)
+      #TODO
+    end
+    
+    ##
+    # The soonest time at which a new value for this var could become active. 
+    # The soonest a value can change is #next_check_at plus the tick_size for 
+    # the current value.  Note, this value does not take into account any 
+    # scheduled changes to the var, so setting a value at this returned time 
+    # does not guarantee success. See #set for documentation on why it can fail
+    # 
+    # @param [Time] active_time The time to use for determining "now".
+    # @return [Time,nil] the next time that the storage system will be checked 
+    def next_available_change_at(active_time=Time.now)
+      #TODO
     end
 
     private
-    def next_check_time
-      
-    end
-
-    def storage
-      @storage
-    end
-
     def active_tuple(current_time)
       @tuples.reverse.find do |tuple|
         active_at, value, check_time = *tuple
