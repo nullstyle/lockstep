@@ -7,7 +7,7 @@ Let's describe a situation.  You run a website that serves a crazy amount of tra
 1.  In your source code:  define a constant value and simply access the in memory value.  The drawback here is that to change this value you need to deploy your application.  This is best used for values that change very infrequently.  This solution is infinitely scaleable, but inflexible.
 1.  In a database: read from the database on every request.  The drawback here is that we are referring to shared storage which might not scale well enough to keep up.  You can always invest in a distributed db that's scales up, that might be complicated to manage, and not worth the cost.  This solution is best used for values that may change frequently and/or provide high value to the application to justify the cost.  This solution is very flexible, but costly.
 
-Lockstep provides a method tradeoff in the middle of cost/flexibility.  It provides a reasonable flexibility by allowing you to use a database to store the value, but allows you to choose a level of scaleability appropriate to how often the value will change.  The more often the value needs to change, the more traffic you database will see.
+Lockstep provides a tradeoff in the middle of cost/flexibility.  It provides a reasonable flexibility by allowing you to use a database to store the value, but allows you to choose a level of scaleability appropriate to how often the value will change.  The more often the value needs to change, the more traffic you database will see.
 
 Let's use a concrete example:  Your application is set to launch a new feature called "foobar" that you aren't sure can withstand the load of your mighty traffic.  You want to do a dark launch (facebook style) to see where you infrastructure starts to fail by gradually turning up the percentage of traffic that triggers this feature.  It wouldn't make sense to read the "percentage active for foobar" from a database, since the load caused by simply reading that value would be significant and effect your results.  Instead, we decide to use a lockstep variable with a tick time of 10 minutes.
 
@@ -27,4 +27,6 @@ In regards to your servers:
 - You have reasonably in sync clocks.  The jitter across your cluster will be the amount of time that a value could be reported as two different values on separate nodes.  This gem is not appropriate for information that absolutely cannot be out of sync at any time across nodes.
 
 In regards to your data:
+
+
 
