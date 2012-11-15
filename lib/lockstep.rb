@@ -1,6 +1,8 @@
 require "lockstep/version"
 
 module Lockstep
+  EPOCH = Time.at(0)
+  
   autoload :Locker, "lockstep/locker"
   autoload :Var, "lockstep/var"
 

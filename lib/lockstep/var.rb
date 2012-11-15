@@ -84,10 +84,12 @@ module Lockstep
 
     private
     def active_tuple(current_time)
-      @tuples.reverse.find do |tuple|
+      found = @tuples.reverse.find do |tuple|
         active_at, value, check_time = *tuple
         active_at <= current_time
       end
+      
+      found || [EPOCH, nil, @tick_size]
     end
 
     def next_tuple(current_time)
@@ -95,6 +97,8 @@ module Lockstep
         active_at, value, check_time = *tuple
         active_at > current_time
       end
+      
+      found || [EPOCH, nil, @tick_size]
     end
 
   end
