@@ -49,6 +49,26 @@ module Lockstep
       
       
     end
+    
+    describe "#next_check_at" do
+      before(:each){ @storage.write("foo", @time_base, 10, 10) }
+      
+      it "should return a Time value" do
+        subject.next_check_at.should be_instance_of(Time)
+      end
+            
+      it "should return the current_time + 1 tick if the current_time is on a tick boundary" do
+        subject.next_check_at(@time_base).should == @time_base + 10
+        subject.next_check_at(@time_base + 10).should == @time_base + 20
+      end
+      
+      it "should return the current_time + (1 tick - tick size) if the current_time is not on a tick boundary" do
+        subject.next_check_at(@time_base + 3).should == @time_base + 10
+        subject.next_check_at(@time_base + 13).should == @time_base + 20
+      end
+      
+    end
+    
   end  
 end
 

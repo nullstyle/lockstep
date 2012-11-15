@@ -66,7 +66,9 @@ module Lockstep
     # @param [Time] active_time The time to use for determining "now".
     # @return [Time,nil] the next time that the storage system will be checked 
     def next_check_at(active_time=Time.now)
-      #TODO
+      time_base, value, tick_size = *active_tuple(active_time)
+      remainder  = (active_time - time_base).to_i % tick_size
+      remainder == 0 ? active_time + tick_size : (active_time + tick_size - remainder)
     end
     
     ##
@@ -99,6 +101,10 @@ module Lockstep
       end
       
       found || [EPOCH, nil, @tick_size]
+    end
+    
+    def tick_size(current_time)
+      active_tuple(current_time)[2]
     end
 
   end
