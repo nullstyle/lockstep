@@ -3,7 +3,10 @@ module Lockstep
   # a Var is the main object within lockstep.  It implements the algorithm
   # described in the readme to provide a scaleable method of 
   # 
-  class Var    
+  class Var
+    attr_reader :tuples
+    attr_reader :last_checked_at
+    
     def initialize(storage, name, tick_size)
       @storage = storage
       @name = name
@@ -52,9 +55,9 @@ module Lockstep
       
     end
 
-    def refresh
+    def refresh(current_time=Time.now)
       @tuples = @storage.read(@name)
-      #TODO: @next_check_at = current_time + active_tuple.tick_size
+      @last_checked_at = current_time
     end
     
     ##

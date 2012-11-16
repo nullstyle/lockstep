@@ -69,6 +69,28 @@ module Lockstep
       
     end
     
+    
+    describe "#refresh" do
+      
+      it "should set last_checked_at to the current_time" do
+        subject.refresh(@time_base)
+        subject.last_checked_at.should == @time_base
+      end
+      
+      it "should load tuples from storage" do
+        subject # initialize the subject so we don't get double read
+        mock(@storage).read("foo")
+        subject.refresh(@time_base)
+      end
+      
+      it "should overwrite the old tuples with the new values" do
+        orig = subject.tuples
+        @storage.write("foo", @time_base, 10, 10)
+        subject.refresh(@time_base)
+        subject.tuples.should_not == orig
+      end
+      
+    end
   end  
 end
 
