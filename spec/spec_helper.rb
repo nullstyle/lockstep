@@ -1,12 +1,20 @@
 require 'rubygems'
 require 'bundler/setup'
+require 'spork'
 
-require 'lockstep' 
-
-RSpec.configure do |config|
-  config.mock_with :rr
+Spork.prefork do
+  require 'rspec'
+  RSpec.configure do |config|
+    config.mock_with :rr
   
-  config.before(:each) do
+    config.before(:each) do
   
+    end
   end
+end
+
+
+
+Spork.each_run do
+  require 'lockstep'
 end
