@@ -7,10 +7,10 @@ module Lockstep
     attr_reader :tuples
     attr_reader :last_checked_at
     
-    def initialize(storage, name, tick_size)
+    def initialize(storage, name, default_tick_size)
       @storage = storage
       @name = name
-      @tick_size = tick_size
+      @default_tick_size = tick_size
 
       refresh
     end
@@ -24,7 +24,9 @@ module Lockstep
     #   become available.  If this time is in the future it will become active
     #   at that time
     # @param [Fixnum] next_tick_size TODO
-    def set(value, desired_active_time=Time.now, next_tick_size=@tick_size)
+    # @return [Time, false] The time at which the new value will become active, 
+    #   or false if the write failed
+    def set(value, desired_active_time=Time.now, next_tick_size=@default_tick_size)
       
     end
     
@@ -105,7 +107,7 @@ module Lockstep
         active_at <= current_time
       end
       
-      found || [EPOCH, nil, @tick_size]
+      found || [EPOCH, nil, @default_tick_size]
     end
 
     def next_tuple(current_time)
@@ -114,7 +116,7 @@ module Lockstep
         active_at > current_time
       end
       
-      found || [EPOCH, nil, @tick_size]
+      found || [EPOCH, nil, @default_tick_size]
     end
     
     def tick_size(current_time)
