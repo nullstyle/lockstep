@@ -10,7 +10,7 @@ module Lockstep
     def initialize(storage, name, default_tick_size)
       @storage = storage
       @name = name
-      @default_tick_size = tick_size
+      @default_tick_size = default_tick_size
 
       refresh
     end
