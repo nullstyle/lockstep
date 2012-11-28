@@ -1,5 +1,12 @@
 # Lockstep - Coordinating value changes across computers cheaply and predicatbly
 
+[![Build Status][travis-image]][travis-link]
+
+[travis-image]: https://secure.travis-ci.org/nullstyle/lockstep.png?branch=master
+[travis-link]: https://travis-ci.org/nullstyle/lockstep
+[travis-home]: http://travis-ci.org/
+
+
 _NOTE: this is still being developed.  it doesn't do shit right now.  but hey, the specs pass_
 
 Let's describe a situation.  You run a website that serves a crazy amount of traffic: Over a billion dynamic requests per day.  That's nearly 12,000 requests per second.  Let's now assume you have a piece of data that you want to access on _every_ request. You also want to be reasonably sure that every server you have sees the same value of that data at a given point in time.  Normally, you have a couple of options to how you can store this data:
@@ -15,10 +22,10 @@ Lockstep achieves this by quantizing the times at which a value can change and b
 
 ## Features
 
-- Low cost: A lockstep variable will generate 2 db calls per tick per process, and an additional db call when a process boots up
+- Low cost: A lockstep variable will generate 1 db call per tick per process, and an additional db call when a process boots up
 - Scheduled changes:  since we store the time at which a value is made active, we can schedule changes beyond just "the next tick"
 - Coordinated: A lockstep variable will change in realtively coordinated fashion on every process in the cluster
-- Simple: not need to install hbase or a complicated distributed database.  Lockstep will most likely work with your existing infrastructure (redis, activerecord)
+- Simple: not need to install hbase or another complicated distributed database.  Lockstep will most likely work with your existing infrastructure (redis, activerecord)
 
 
 ## Assumptions
@@ -26,7 +33,13 @@ Lockstep achieves this by quantizing the times at which a value can change and b
 In regards to your servers:
 - You have reasonably in sync clocks.  The jitter across your cluster will be the amount of time that a value could be reported as two different values on separate nodes.  This gem is not appropriate for information that absolutely cannot be out of sync at any time across nodes.
 
-In regards to your data:
+## Contributors
 
+- Scott Fleckenstein
+
+## Contributing
+
+[Fork the project](https://github.com/nullstyle/lockstep) and send pull
+requests.
 
 
