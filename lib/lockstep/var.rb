@@ -57,8 +57,12 @@ module Lockstep
       refresh(current_time) if current_time > next_check_at(@last_checked_at)
     end
 
-    def purge_old_values
-      
+    ##
+    # Removes expired tuples from storage.
+    # 
+    # @param [Fixnum] old_values_to_keep How many expired tuples to keep around
+    def purge_old_values(old_values_to_keep=5)
+      #TODO
     end
 
     ##
