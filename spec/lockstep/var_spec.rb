@@ -70,6 +70,13 @@ module Lockstep
       
     end
     
+    describe "#next_available_change_at" do
+      
+      it "should return a Time value" do
+        subject.next_available_change_at.should be_instance_of(Time)
+      end
+      
+    end
     
     describe "#refresh" do
       
@@ -92,6 +99,22 @@ module Lockstep
       end
       
     end
-  end  
+    describe "#refresh_if_needed" do
+    
+      it "should call to refresh if the current_time is >= the next_check_time from the last_check_time" do
+        subject.refresh(@time_base)
+        check_time = @time_base + @tick_size
+        
+        mock(subject).refresh(check_time)
+        subject.refresh_if_needed(check_time)
+      end
+    
+      it "should not call to refresh if current_time < the next scheduled check time" do
+        
+        mock(subject).refresh.never
+        subject.refresh_if_needed(@time_base)
+      end
+    end
+  end
 end
 

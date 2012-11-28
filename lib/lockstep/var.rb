@@ -43,21 +43,32 @@ module Lockstep
       value
     end
 
-    def refresh_if_needed
-      #TODO
-      # check tick size of current value
-      # if blah
-      
-      refresh
+    ##
+    # Refreshes the set of cached tuples only if enough time has elapsed since
+    # the last check
+    # 
+    # @param [Time] current_time The time to test against to 
+    #   see whether we should check again
+    # @return [Array,nil] An array of loaded tuples if storage 
+    #   was checked, nil otherwise
+    def refresh_if_needed(current_time=Time.now)
+      refresh(current_time) if current_time > next_check_at(@last_checked_at)
     end
 
     def purge_old_values
       
     end
 
+    ##
+    # Refreshes the set of cached tuples from storage, regardless of whether it
+    #  is time to check again or not
+    # 
+    # @param [Time] current_time The current time.  This gets stored to determine when to refresh next
+    # @return [Array] an array of tuples that are cached on this var
     def refresh(current_time=Time.now)
       @tuples = @storage.read(@name)
       @last_checked_at = current_time
+      @tuples
     end
     
     ##
@@ -84,7 +95,7 @@ module Lockstep
     # @param [Time] active_time The time to use for determining "now".
     # @return [Time,nil] the next time that the storage system will be checked 
     def next_available_change_at(active_time=Time.now)
-      #TODO
+      next_check_at(active_time) + tick_size(active_time)
     end
 
     private
