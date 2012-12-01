@@ -1,6 +1,7 @@
 # Lockstep - Coordinating value changes across computers cheaply and predicatbly
 
-[![Build Status][travis-image]][travis-link]
+[![Build Status][travis-image]][travis-link] 
+[![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/nullstyle/lockstep)
 
 [travis-image]: https://secure.travis-ci.org/nullstyle/lockstep.png?branch=master
 [travis-link]: https://travis-ci.org/nullstyle/lockstep
