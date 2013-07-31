@@ -34,5 +34,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rb-fsevent"
   
   s.add_development_dependency "redis"
+  s.add_development_dependency "pry"
 
 end
