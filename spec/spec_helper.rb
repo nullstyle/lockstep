@@ -5,7 +5,6 @@ require 'spork'
 Spork.prefork do
   require 'rspec'
   RSpec.configure do |config|
-    config.mock_with :rr
   
     config.before(:each) do
   

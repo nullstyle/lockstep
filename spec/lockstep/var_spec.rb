@@ -23,8 +23,8 @@ module Lockstep
       end
       
       it "should refresh the cached set of tuples if needed" do
-        mock(subject).refresh_if_needed
-        subject.get 
+        expect(subject).to receive(:refresh_if_needed)
+        subject.get
       end
       
       it "should return the newest value (based upon active_at) that is active" do
@@ -47,8 +47,13 @@ module Lockstep
     end
     
     describe "#set" do
+      context "when no value previous value set" do
+        
+      end
       
-      
+      context "when a value is already set" do
+        
+      end
     end
     
     describe "#next_check_at" do
@@ -87,7 +92,7 @@ module Lockstep
       
       it "should load tuples from storage" do
         subject # initialize the subject so we don't get double read
-        mock(@storage).read("foo")
+        expect(@storage).to receive(:read).with("foo")
         subject.refresh(@time_base)
       end
       
@@ -97,21 +102,20 @@ module Lockstep
         subject.refresh(@time_base)
         subject.tuples.should_not == orig
       end
-      
     end
+
     describe "#refresh_if_needed" do
-    
       it "should call to refresh if the current_time is >= the next_check_time from the last_check_time" do
         subject.refresh(@time_base)
         check_time = @time_base + @tick_size
         
-        mock(subject).refresh(check_time)
+        expect(subject).to receive(:refresh).with(check_time)
         subject.refresh_if_needed(check_time)
       end
     
       it "should not call to refresh if current_time < the next scheduled check time" do
         
-        mock(subject).refresh.never
+        expect(subject).to receive(:refresh).never
         subject.refresh_if_needed(@time_base)
       end
     end
