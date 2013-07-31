@@ -129,7 +129,7 @@ module Lockstep
       end
 
       context "when the current_time is < the next scheduled check time" do
-        Given(:current_time){ refresh_time + (tick_size - 1)}
+        Given(:current_time){ subject.next_check_at(refresh_time) - 1}
 
         Then{ subject.should_not have_received(:refresh) }
         Then{ subject.last_checked_at.should eq(refresh_time) }
