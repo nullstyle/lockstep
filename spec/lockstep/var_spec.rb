@@ -2,121 +2,137 @@ require 'spec_helper'
 
 module Lockstep
   describe Var do
-    before(:each) do 
-      @storage = Storage::Memory.new
-      @time_base = Time.now  
-      @tick_size = 10
-    end
+    Given!(:time_base){ Time.now  }
+
+    Given(:storage)   { Storage::Memory.new }
+    Given(:var_name)  { "foo" }
+    Given(:tick_size) { 20 }
+
+    Given(:old_value){ 10 }
+    Given(:active_value){ 20 }
+    Given(:future_value){ 30 }
     
-    subject do
-      Var.new(@storage, "foo", @tick_size)
-    end
+    subject { Var.new(storage, var_name, tick_size) }
   
     describe "#get" do
-      it "should return nil if no value has ever been set" do
-        subject.get.should eq(nil)
+      Given{ subject.stub(:refresh_if_needed).and_call_original }
+
+      When(:result){ subject.get time_base }
+
+      context "when no value has been set" do
+        Then{ result.should be_nil }
+        Then{ subject.should have_received(:refresh_if_needed) }
       end
-      
-      it "should return nil if no tuples stored could be considered active" do
-        @storage.write("foo", @time_base + 1 , 10, @tick_size)
-        subject.get(@time_base).should be_nil
+
+      context "when no tuples stored could be considered active" do
+        Given{ storage.write(var_name, time_base + 1 , future_value, tick_size) }
+        Then{ result.should be_nil }
       end
-      
-      it "should refresh the cached set of tuples if needed" do
-        expect(subject).to receive(:refresh_if_needed)
-        subject.get
+
+      context "when two tuples are in storage" do
+
+
+        Given do
+          storage.write(var_name, time_base - 10, old_value, tick_size)
+          storage.write(var_name, time_base - 5, active_value, tick_size)
+          subject.refresh
+        end
+
+        Then{ result.should eq(active_value) }
       end
-      
-      it "should return the newest value (based upon active_at) that is active" do
-        @storage.write("foo", @time_base - 10, 10, @tick_size)
-        @storage.write("foo", @time_base - 5, 20, @tick_size)
-        subject.get(@time_base).should eq(20)
+
+      context "when a tuple became active this second" do
+        Given{ storage.write(var_name, time_base, active_value, tick_size) }
+        Given{ subject.refresh }
+        Then{ result.should eq(active_value) }
       end
-      
-      it "should return a value that is made active on the second it becomes available" do
-        @storage.write("foo", @time_base, 10, @tick_size)
-        subject.get(@time_base).should eq(10)
-      end
-      
-      
-      it "should return the oldest active value, even if a future value is scheduled" do
-        @storage.write("foo", @time_base, 10, @tick_size)
-        @storage.write("foo", @time_base + 1, 20, @tick_size)
-        subject.get(@time_base).should eq(10)
+
+      context "when a tuple exists in the future" do
+        Given{ storage.write(var_name, time_base, active_value, tick_size) }
+        Given{ storage.write(var_name, time_base + 1, future_value, tick_size) }
+        Given{ subject.refresh }
+
+        Then{ result.should eq(active_value) }
       end
     end
     
     describe "#set" do
-      context "when no value previous value set" do
-        
-      end
-      
-      context "when a value is already set" do
-        
-      end
+      #TODO
     end
     
     describe "#next_check_at" do
-      before(:each){ @storage.write("foo", @time_base, 10, @tick_size) }
-      
-      it "should return a Time value" do
-        subject.next_check_at.should be_instance_of(Time)
+      Given{ storage.write(var_name, time_base, active_value, tick_size) }
+      Given(:args){[]}
+      When(:result){ subject.next_check_at(*args) }
+      Then{ result.should be_instance_of(Time) }
+
+      context "when the provided time is current and on the tick boundary" do
+        Given(:args){[time_base]}
+        Then{ result.should eq(time_base + tick_size)}
       end
-            
-      it "should return the current_time + 1 tick if the current_time is on a tick boundary" do
-        subject.next_check_at(@time_base).should == @time_base + @tick_size
-        subject.next_check_at(@time_base + 10).should == @time_base + (@tick_size * 2)
+
+      context "when the provided time is in the future and on the tick boundary" do
+        Given(:args){[time_base + tick_size]}
+        Then{ result.should eq(time_base +  (tick_size * 2))}
       end
-      
-      it "should return the current_time + (1 tick - tick size) if the current_time is not on a tick boundary" do
-        subject.next_check_at(@time_base + 3).should == @time_base + @tick_size
-        subject.next_check_at(@time_base + 13).should == @time_base + (@tick_size * 2)
+
+
+      context "when the provided time is in the future and not on a tick boundary" do
+        Given(:args){[time_base + 3]}
+        Then{ result.should eq(time_base + tick_size)}
       end
-      
+
+
+      context "when the provided time is more than one tick in the future and not on a tick boundary" do
+        Given(:args){[time_base + tick_size + 3]}
+        Then{ result.should eq(time_base + (tick_size * 2))}
+      end      
     end
     
     describe "#next_available_change_at" do
-      
-      it "should return a Time value" do
-        subject.next_available_change_at.should be_instance_of(Time)
-      end
-      
+      When(:result){ subject.next_available_change_at }
+      Then{ result.should be_instance_of(Time) }
     end
     
     describe "#refresh" do
-      
-      it "should set last_checked_at to the current_time" do
-        subject.refresh(@time_base)
-        subject.last_checked_at.should == @time_base
-      end
-      
-      it "should load tuples from storage" do
-        subject # initialize the subject so we don't get double read
-        expect(@storage).to receive(:read).with("foo")
-        subject.refresh(@time_base)
-      end
-      
-      it "should overwrite the old tuples with the new values" do
-        orig = subject.tuples
-        @storage.write("foo", @time_base, 10, @tick_size)
-        subject.refresh(@time_base)
-        subject.tuples.should_not == orig
-      end
+      Given!(:tuples_before_refresh){ subject.tuples }
+      Given{ storage.stub(:read).and_call_original }
+      Given{ storage.write(var_name, time_base, active_value, tick_size) }
+      When{ subject.refresh(time_base) }
+
+      Then{ subject.last_checked_at.should eq(time_base) }
+      Then{ storage.should have_received(:read).with(var_name) }
+      Then{ subject.tuples.should_not eq(tuples_before_refresh) }
     end
 
     describe "#refresh_if_needed" do
-      it "should call to refresh if the current_time is >= the next_check_time from the last_check_time" do
-        subject.refresh(@time_base)
-        check_time = @time_base + @tick_size
-        
-        expect(subject).to receive(:refresh).with(check_time)
-        subject.refresh_if_needed(check_time)
+
+      Given(:current_time){ time_base }
+      Given(:refresh_time){ time_base }
+      Given{ subject.refresh(refresh_time) }
+
+      Given{ subject.stub(:refresh).and_call_original }
+
+      When{  subject.refresh_if_needed(current_time) }
+
+      context "when the current_time is >= the next_check_time" do
+        Given(:current_time){ subject.last_checked_at + tick_size }
+        Then{ subject.should have_received(:refresh).with(current_time) }
+        Then{ subject.last_checked_at.should eq(current_time) }
       end
-    
-      it "should not call to refresh if current_time < the next scheduled check time" do
-        
-        expect(subject).to receive(:refresh).never
-        subject.refresh_if_needed(@time_base)
+
+      context "when the current_time is same as the last refresh time" do
+        Given(:current_time){ refresh_time  }
+
+        Then{ subject.should_not have_received(:refresh) }
+        Then{ subject.last_checked_at.should eq(refresh_time) }
+      end
+
+      context "when the current_time is < the next scheduled check time" do
+        Given(:current_time){ refresh_time + (tick_size - 1)}
+
+        Then{ subject.should_not have_received(:refresh) }
+        Then{ subject.last_checked_at.should eq(refresh_time) }
       end
     end
   end
