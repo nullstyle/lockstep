@@ -27,7 +27,11 @@ module Lockstep
     # @return [Time, false] The time at which the new value will become active, 
     #   or false if the write failed
     def set(value, desired_active_time=Time.now, next_tick_size=@default_tick_size)
+      active_time = next_available_change_at(desired_active_time)
       
+      @storage.write(@name, active_time, value, next_tick_size)
+      
+      active_time
     end
     
     ##
@@ -75,6 +79,19 @@ module Lockstep
       @tuples = @storage.read(@name)
       @last_checked_at = current_time
       @tuples
+    end
+    
+    ##
+    # Iterates through all known pending tuples and adjusts their active time
+    #  to fixup any discrepencies due to writes into the system.  This most
+    #  normally occurs when a scheduled change is far in the future and another
+    #  value is written to storage in between the scheduled change and the
+    #  current value.  Given that the tick size can change with any tuple, you
+    #  could produce an invalid tuple state
+    # 
+    def reschedule
+      # get non-old tuples
+      # iterate through them, rescheduling
     end
     
     ##
