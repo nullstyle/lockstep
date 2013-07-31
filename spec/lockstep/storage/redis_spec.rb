@@ -10,6 +10,6 @@ describe Lockstep::Storage::Redis do
     Lockstep::Storage::Redis.new(redis)
   end
   
-  include_context "storage_specs"
+  it_should_behave_like "storage back end"
 end
 
