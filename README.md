@@ -8,7 +8,7 @@
 [travis-home]: http://travis-ci.org/
 
 
-_NOTE: this is still being developed.  it doesn't do shit right now.  but hey, the specs pass_
+_NOTE: this works, but we don't yet have any specs for write operations_
 
 Let's describe a situation.  You run a website that serves a crazy amount of traffic: Over a billion dynamic requests per day.  That's nearly 12,000 requests per second.  Let's now assume you have a piece of data that you want to access on _every_ request. You also want to be reasonably sure that every server you have sees the same value of that data at a given point in time.  Normally, you have a couple of options to how you can store this data:
 
