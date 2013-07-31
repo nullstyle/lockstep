@@ -18,7 +18,7 @@ module Lockstep
     # @param [String,Symbol] name the name of this var.
     # @param [Fixnum] tick_size The default tick_size of the returned var
     def var(name, tick_size=20)
-      @vars[name] ||= Var.new(self, name, tick_size)
+      @vars[name] ||= Var.new(@storage, name, tick_size)
     end
 
     ##
